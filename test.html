@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Cognigy Plugin Test</title>
@@ -14,36 +15,64 @@
         window.cognigyWebchatMessagePlugins = [];
     </script>
 </head>
+
 <body>
     <h1>Cognigy Plugin Verification</h1>
-    <div id="status">Loading plugin...</div>
-    <div id="plugin-container"></div>
+
+    <h2>Counter Plugin</h2>
+    <div id="counter-status">Waiting...</div>
+    <div id="counter-container"></div>
+
+    <h2>Table Plugin</h2>
+    <div id="table-status">Waiting...</div>
+    <div id="table-container"></div>
 
     <script src="./dist/plugin.js"></script>
 
     <script>
-        const statusDiv = document.getElementById('status');
-        const container = document.getElementById('plugin-container');
+        const renderPlugin = (match, containerId, statusId, mockMessage) => {
+            const statusDiv = document.getElementById(statusId);
+            const container = document.getElementById(containerId);
 
-        if (window.cognigyWebchatMessagePlugins.length > 0) {
-            const plugin = window.cognigyWebchatMessagePlugins[0];
-            statusDiv.textContent = `Plugin registered: ${plugin.match}`;
-            statusDiv.style.color = 'green';
+            const plugin = window.cognigyWebchatMessagePlugins.find(p => p.match === match);
 
-            // Try to render the component
-            try {
-                const root = ReactDOM.createRoot(container);
-                root.render(React.createElement(plugin.component));
-            } catch (e) {
-                console.error(e);
-                statusDiv.textContent += ' (Render failed, check console)';
-                statusDiv.style.color = 'orange';
+            if (plugin) {
+                statusDiv.textContent = `Plugin registered: ${plugin.match}`;
+                statusDiv.style.color = 'green';
+
+                try {
+                    const root = ReactDOM.createRoot(container);
+                    // Pass the mock message as props
+                    root.render(React.createElement(plugin.component, { message: mockMessage }));
+                } catch (e) {
+                    console.error(e);
+                    statusDiv.textContent += ' (Render failed, check console)';
+                    statusDiv.style.color = 'orange';
+                }
+            } else {
+                statusDiv.textContent = `Plugin '${match}' not found.`;
+                statusDiv.style.color = 'red';
             }
+        };
 
-        } else {
-            statusDiv.textContent = 'No plugins registered.';
-            statusDiv.style.color = 'red';
-        }
+        // Test Counter
+        renderPlugin('counter', 'counter-container', 'counter-status', {});
+
+        // Test Table
+        const mockTableMessage = {
+            data: {
+                _plugin: {
+                    data: [
+                        { id: 1, name: 'Alice', role: 'Admin' },
+                        { id: 2, name: 'Bob', role: 'User' },
+                        { id: 3, name: 'Charlie', role: 'Guest' }
+                    ]
+                }
+            }
+        };
+        renderPlugin('table', 'table-container', 'table-status', mockTableMessage);
+
     </script>
 </body>
+
 </html>
