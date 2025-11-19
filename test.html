@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cognigy Plugin Test</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script>
+        // Mock Cognigy Webchat Environment
+        window.__COGNIGY_WEBCHAT = {
+            React: window.React,
+            ReactDOM: window.ReactDOM
+        };
+        window.cognigyWebchatMessagePlugins = [];
+    </script>
+</head>
+<body>
+    <h1>Cognigy Plugin Verification</h1>
+    <div id="status">Loading plugin...</div>
+    <div id="plugin-container"></div>
+
+    <script src="./dist/plugin.js"></script>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const container = document.getElementById('plugin-container');
+
+        if (window.cognigyWebchatMessagePlugins.length > 0) {
+            const plugin = window.cognigyWebchatMessagePlugins[0];
+            statusDiv.textContent = `Plugin registered: ${plugin.match}`;
+            statusDiv.style.color = 'green';
+
+            // Try to render the component
+            try {
+                const root = ReactDOM.createRoot(container);
+                root.render(React.createElement(plugin.component));
+            } catch (e) {
+                console.error(e);
+                statusDiv.textContent += ' (Render failed, check console)';
+                statusDiv.style.color = 'orange';
+            }
+
+        } else {
+            statusDiv.textContent = 'No plugins registered.';
+            statusDiv.style.color = 'red';
+        }
+    </script>
+</body>
+</html>
