@@ -11,7 +11,17 @@ interface TableProps {
 }
 
 const Table: React.FC<TableProps> = (props) => {
-    const data = props.message?.data?._plugin?.data;
+    let data = props.message?.data?._plugin?.data;
+
+    // Handle case where data is passed as a JSON string (common in CognigyScript)
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            console.error('Failed to parse Table data:', e);
+            return <div>Error parsing table data</div>;
+        }
+    }
 
     if (!data || !Array.isArray(data) || data.length === 0) {
         return <div>No data available</div>;

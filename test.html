@@ -23,9 +23,13 @@
     <div id="counter-status">Waiting...</div>
     <div id="counter-container"></div>
 
-    <h2>Table Plugin</h2>
+    <h2>Table Plugin (Array Data)</h2>
     <div id="table-status">Waiting...</div>
     <div id="table-container"></div>
+
+    <h2>Table Plugin (String Data)</h2>
+    <div id="table-string-status">Waiting...</div>
+    <div id="table-string-container"></div>
 
     <script src="./dist/plugin.js"></script>
 
@@ -58,19 +62,31 @@
         // Test Counter
         renderPlugin('counter', 'counter-container', 'counter-status', {});
 
-        // Test Table
+        // Test Table (Array)
         const mockTableMessage = {
             data: {
                 _plugin: {
                     data: [
                         { id: 1, name: 'Alice', role: 'Admin' },
-                        { id: 2, name: 'Bob', role: 'User' },
-                        { id: 3, name: 'Charlie', role: 'Guest' }
+                        { id: 2, name: 'Bob', role: 'User' }
                     ]
                 }
             }
         };
         renderPlugin('table', 'table-container', 'table-status', mockTableMessage);
+
+        // Test Table (String)
+        const mockTableStringMessage = {
+            data: {
+                _plugin: {
+                    data: JSON.stringify([
+                        { id: 3, name: 'Charlie', role: 'Guest' },
+                        { id: 4, name: 'Dave', role: 'Support' }
+                    ])
+                }
+            }
+        };
+        renderPlugin('table', 'table-string-container', 'table-string-status', mockTableStringMessage);
 
     </script>
 </body>
