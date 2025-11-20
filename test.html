@@ -12,6 +12,19 @@
             React: window.React,
             ReactDOM: window.ReactDOM
         };
+
+        // Mock sendMessage (should NOT be called now)
+        window.cognigyWebchat = {
+            sendMessage: (text, data) => {
+                console.error('Mock sendMessage called UNEXPECTEDLY:', text, data);
+                const statusDiv = document.getElementById('command-status');
+                if (statusDiv) {
+                    statusDiv.textContent = `Error: sendMessage was called!`;
+                    statusDiv.style.color = 'red';
+                }
+            }
+        };
+
         window.cognigyWebchatMessagePlugins = [];
     </script>
 </head>
@@ -30,6 +43,10 @@
     <h2>Table Plugin (String Data)</h2>
     <div id="table-string-status">Waiting...</div>
     <div id="table-string-container"></div>
+
+    <h2>Headless Command Plugin</h2>
+    <div id="command-status">Waiting (Should remain empty)...</div>
+    <div id="command-container"></div>
 
     <script src="./dist/plugin.js"></script>
 
@@ -87,6 +104,29 @@
             }
         };
         renderPlugin('table', 'table-string-container', 'table-string-status', mockTableStringMessage);
+
+        // Test Headless Command
+        const mockCommandMessage = {
+            data: {
+                _plugin: {
+                    type: 'command',
+                    payload: {
+                        action: 'update-profile',
+                        user: 'Petr'
+                    }
+                }
+            }
+        };
+        // Note: We render it. We expect NO visual output and NO side effects (sendMessage not called).
+        renderPlugin('command', 'command-container', 'command-status', mockCommandMessage);
+
+        // Update status to confirm it rendered without error
+        setTimeout(() => {
+            const statusDiv = document.getElementById('command-status');
+            if (statusDiv.textContent === 'Plugin registered: command') {
+                statusDiv.textContent += ' (Passive Mode Verified)';
+            }
+        }, 500);
 
     </script>
 </body>

@@ -4,6 +4,9 @@
 declare global {
     interface Window {
         __COGNIGY_WEBCHAT: any;
+        cognigyWebchat: {
+            sendMessage: (text: string, data?: any) => void;
+        };
     }
 }
 
